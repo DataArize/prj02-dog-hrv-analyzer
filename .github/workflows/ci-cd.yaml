@@ -50,3 +50,19 @@ jobs:
           --entry-point=process_sensor_data \
           --set-env-vars DATASET_ID=${{ secrets.DATASET_ID }},TABLE_ID=${{ secrets.TABLE_ID }} \
           --memory=2048 --cpu=2
+
+      - name: Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: workflow,job,commit,repo,ref,author,took
+          custom_payload: |
+            {
+              attachments: [{
+                color: '${{ job.status }}' === 'success' ? 'good' : '${{ job.status }}' === 'failure' ? 'danger' : 'warning',
+                text: `Action Name: ${process.env.AS_WORKFLOW}\n Repository Name:${process.env.AS_REPO}@${process.env.AS_REF} by ${process.env.AS_AUTHOR} ${{ job.status }} in ${process.env.AS_TOOK}`,
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
