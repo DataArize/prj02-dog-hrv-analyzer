@@ -43,7 +43,7 @@ jobs:
         run: |
           gcloud functions deploy $FUNCTION_NAME \
           --region=${{ secrets.PROJECT_REGION }} \
-          --runtime=${{ secrets.PYTHON_VERSION }} \
+          --runtime=${{ secrets.PYTHON_RUNTIME }} \
           --trigger-bucket=${{ secrets.SOURCE_BUCKET_NAME }} \
           --source=src \
           --entry-point=process_sensor_data \
