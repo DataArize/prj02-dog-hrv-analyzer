@@ -5,8 +5,7 @@ from exceptions.fetch_max_timestamp_error import FetchMaxTimestampError
 from utils.logger import create_logger
 from exceptions.data_load_error import DataLoadError
 from constants.config_contants import MAX_TIMESTAMP
-
-from src.constants.config_contants import SENSOR_ID
+from constants.config_contants import SENSOR_ID
 
 
 class BigQueryClient:
