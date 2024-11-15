@@ -20,8 +20,9 @@ hrv_calculator = HRVCalculator()
 @functions_framework.cloud_event
 def process_sensor_data(cloud_event):
     logger.info(f"Cloud event received, event: ${cloud_event}")
-    file_name = cloud_event[EVENT_DATA_FILE_PLACEHOLDER]
-    bucket_name = cloud_event[EVENT_DATA_BUCKET_PLACEHOLDER]
+    data = cloud_event.data
+    file_name = data[EVENT_DATA_FILE_PLACEHOLDER]
+    bucket_name = data[EVENT_DATA_BUCKET_PLACEHOLDER]
     logger.info(f"File name: ${file_name}, Bucket name: {bucket_name}")
     data_frame = storage_client.fetch_and_validate_csv(bucket_name, file_name)
     data_frame[START_TIMESTAMP] = pd.to_datetime(data_frame[TIMESTAMP_STR_KEY], format=TIMESTAMP_FORMAT, utc=True,

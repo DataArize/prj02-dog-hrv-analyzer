@@ -40,4 +40,12 @@ jobs:
           fi
 
       - name: Deploy to cloud function
-        run: gcloud functions deploy $FUNCTION_NAME --runtime python312 --trigger-http --entry-point process_sensor_data --source src --set-env-vars DATASET_ID=${{ secrets.DATASET_ID }},TABLE_ID=${{ secrets.TABLE_ID }}
+        run: |
+          gcloud functions deploy $FUNCTION_NAME \
+          --region=${{ secrets.PROJECT_REGION }} \
+          --runtime=${{ secrets.PYTHON_VERSION }} \
+          --trigger-bucket=${{ secrets.SOURCE_BUCKET_NAME }} \
+          --source=src \
+          --entry-point=process_sensor_data \
+          --set-env-vars DATASET_ID=${{ secrets.DATASET_ID }},TABLE_ID=${{ secrets.TABLE_ID }} \
+          --memory=2048 --cpu=2
