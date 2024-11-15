@@ -3,7 +3,7 @@ from utils.logger import create_logger
 import pandas as pd
 from typing import Optional
 import logging
-from src.exceptions.empty_data_error import EmptyDataError
+from exceptions.empty_data_error import EmptyDataError
 
 
 class DataPreprocessor:

@@ -26,7 +26,7 @@ jobs:
           cache: 'pip'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r src/requirements.txt
 
       - name: Determine Function Name
         id: function_name
@@ -40,4 +40,13 @@ jobs:
           fi
 
       - name: Deploy to cloud function
-        run: gcloud functions deploy $FUNCTION_NAME --runtime python312 --trigger-http --entry-point process_sensor_data --source src --set-env-vars DATASET_ID=${{ secrets.DATASET_ID }},TABLE_ID=${{ secrets.TABLE_ID }}
+        run: |
+          gcloud functions deploy $FUNCTION_NAME \
+          --gen-2 \
+          --region=${{ secrets.PROJECT_REGION }} \
+          --runtime=${{ secrets.PYTHON_RUNTIME }} \
+          --trigger-bucket=${{ secrets.SOURCE_BUCKET_NAME }} \
+          --source=src \
+          --entry-point=process_sensor_data \
+          --set-env-vars DATASET_ID=${{ secrets.DATASET_ID }},TABLE_ID=${{ secrets.TABLE_ID }} \
+          --memory=2048 --cpu=2
