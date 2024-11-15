@@ -42,7 +42,7 @@ jobs:
       - name: Deploy to cloud function
         run: |
           gcloud functions deploy $FUNCTION_NAME \
-          --verbosity=debug \
+          --gen-2 \
           --region=${{ secrets.PROJECT_REGION }} \
           --runtime=${{ secrets.PYTHON_RUNTIME }} \
           --trigger-bucket=${{ secrets.SOURCE_BUCKET_NAME }} \
