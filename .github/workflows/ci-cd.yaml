@@ -1,0 +1,43 @@
+name: CI-CD
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy_to_cloud_function:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v2
+        with:
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ secrets.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Determine Function Name
+        id: function_name
+        run: |
+          if [[ "${GITHUB_REF##*/}" == "develop" ]]; then
+            echo "FUNCTION_NAME=${{ secrets.GCP_FUNCTION_NAME }}-dev" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF##*/}" == "main" ]]; then
+            echo "FUNCTION_NAME=${{ secrets.GCP_FUNCTION_NAME }}-prod" >> $GITHUB_ENV
+          else
+            echo "FUNCTION_NAME=${{ secrets.GCP_FUNCTION_NAME }}-staging" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy to cloud function
+        run: gcloud functions deploy $FUNCTION_NAME --runtime python312 --trigger-http --entry-point process_sensor_data --source src --set-env-vars DATASET_ID=${{ secrets.DATASET_ID }},TABLE_ID=${{ secrets.TABLE_ID }}
