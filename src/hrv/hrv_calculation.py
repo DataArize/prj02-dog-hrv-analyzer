@@ -3,7 +3,7 @@ import numpy as np
 import logging
 from typing import Optional
 from utils.logger import create_logger
-from constants.config_contants import START_TIMESTAMP, END_TIMESTAMP, HRV_RMSSD, RR_INTERVAL_MS, NEXT_TIMESTAMP_STR_KEY, TIMESTAMP_STR_KEY
+from constants.config_contants import START_TIMESTAMP, END_TIMESTAMP, HRV_RMSSD, RR_INTERVAL_MS, NEXT_TIMESTAMP_STR_KEY, TIMESTAMP_STR_KEY, COMPUTED_SQUARE, COMPUTED_MEAN
 
 
 class HRVCalculator:
@@ -16,10 +16,10 @@ class HRVCalculator:
             self.logger.error("Input series must be a pandas Series.")
             raise ValueError("Input series must be a pandas Series.")
 
-        diffs = series.diff().dropna()
-        squared_diffs = diffs ** 2
-        rmssd_value = np.sqrt(squared_diffs.mean())
-        return rmssd_value
+        squared_diffs = series ** 2
+        mean = squared_diffs.mean()
+        rmssd_value = np.sqrt(mean)
+        return rmssd_value / 10
 
     def calculate_rr_intervals(self, df: pd.DataFrame) -> pd.DataFrame:
 
@@ -42,8 +42,10 @@ class HRVCalculator:
             self.logger.warning("Some timestamps are invalid or missing. These will be handled as NaT (Not a Time).")
         interpolated_df = self.calculate_rr_intervals(interpolated_df)
         self.logger.info("Calculating HRV using RMSSD over a rolling window.")
-        interpolated_df[HRV_RMSSD] = (interpolated_df[RR_INTERVAL_MS]
-                                      .rolling(window=10).apply(self.calculate_rmssd, raw=False))
+        interpolated_df[COMPUTED_SQUARE] = interpolated_df[RR_INTERVAL_MS] ** 2
+        interpolated_df[COMPUTED_MEAN] = (interpolated_df[COMPUTED_SQUARE]
+                                          .rolling(window=10).apply(lambda s: s.mean(), raw=False))
+        interpolated_df[HRV_RMSSD] = (interpolated_df[COMPUTED_MEAN] ** 0.5) / 10
         interpolated_df[TIMESTAMP_STR_KEY] = pd.to_datetime(interpolated_df[TIMESTAMP_STR_KEY], errors='coerce')
         interpolated_df[NEXT_TIMESTAMP_STR_KEY] = pd.to_datetime(interpolated_df[NEXT_TIMESTAMP_STR_KEY], errors='coerce')
         self.logger.info("HRV calculation completed.")

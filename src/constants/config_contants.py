@@ -16,6 +16,11 @@ MAX_TIMESTAMP = "max_timestamp"
 SENSOR_ID = "sensor_id"
 RR_INTERVAL_MS = "RR_interval_ms"
 HRV_RMSSD = "HRV_RMSSD"
+COMPUTED_SQUARE = "COMPUTED_SQUARE"
+COMPUTED_MEAN = "COMPUTED_MEAN"
+TIME_DIFF = "time_diff"
+COMPUTED_TIME_GAP = "COMPUTED_TIME_GAP"
+HEARTBEAT = "heartbeat"
 
 COLUMNS = ['heartbeat', 'device', 'timestamp_str', 'next_timestamp_str', 'time_gap_seconds']
 
