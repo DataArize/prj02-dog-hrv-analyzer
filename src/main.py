@@ -2,13 +2,12 @@ import functions_framework
 import pandas as pd
 
 from constants.config_contants import EVENT_DATA_FILE_PLACEHOLDER, EVENT_DATA_BUCKET_PLACEHOLDER, START_TIMESTAMP, \
-    END_TIMESTAMP, TIMESTAMP_STR_KEY, NEXT_TIMESTAMP_STR_KEY, TIMESTAMP_FORMAT, DEVICE
+    END_TIMESTAMP, TIMESTAMP_STR_KEY, NEXT_TIMESTAMP_STR_KEY, TIMESTAMP_FORMAT, DEVICE, TIME_DIFF
 from bigquery.bigquery_client import BigQueryClient
 from config.settings import Settings
 from exceptions.empty_data_error import EmptyDataError
 from hrv.hrv_calculation import HRVCalculator
 from preprocessor.data_preprocessor import DataPreprocessor
-from src.constants.config_contants import TIME_DIFF
 from storage.storage_client import StorageClient
 from utils.logger import create_logger
 
