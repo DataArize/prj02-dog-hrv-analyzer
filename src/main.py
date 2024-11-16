@@ -8,6 +8,7 @@ from config.settings import Settings
 from exceptions.empty_data_error import EmptyDataError
 from hrv.hrv_calculation import HRVCalculator
 from preprocessor.data_preprocessor import DataPreprocessor
+from src.constants.config_contants import TIME_DIFF
 from storage.storage_client import StorageClient
 from utils.logger import create_logger
 
@@ -50,9 +51,11 @@ def process_sensor_data(cloud_event):
             delta_df=delta_df
         )
         interpolated_df = hrv_calculator.calculate_hrv(interpolated_df=interpolated_df)
+        interpolated_df = interpolated_df.drop(TIME_DIFF, axis=1)
         bigquery_client.load_data(
             interpolated_df=interpolated_df,
             dataset_id=Settings.DATASET_ID,
             table_id=Settings.TABLE_ID,
             write_disposition='WRITE_APPEND'
         )
+
